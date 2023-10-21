@@ -15,6 +15,7 @@
 #ifdef PANDA3DS_ENABLE_VULKAN
 #include "renderer_vk/renderer_vk.hpp"
 #endif
+#include<android/log.h>
 
 constexpr u32 topScreenWidth = 240;
 constexpr u32 topScreenHeight = 400;
@@ -58,6 +59,7 @@ GPU::GPU(Memory& mem, EmulatorConfig& config) : mem(mem), config(config) {
 			break;
 		}
 	}
+	__android_log_print(ANDROID_LOG_INFO, "Panda3D", "GPU::GPU()");
 }
 
 void GPU::reset() {

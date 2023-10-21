@@ -1,10 +1,12 @@
 #include "cheats.hpp"
 
+#include <android/log.h>
 Cheats::Cheats(Memory& mem, HIDService& hid) : ar(mem, hid) { reset(); }
 
 void Cheats::reset() {
 	clear();     // Clear loaded cheats
 	ar.reset();  // Reset ActionReplay
+	__android_log_print(ANDROID_LOG_INFO, "Cheats", "Cheats reset");
 }
 
 void Cheats::addCheat(const Cheat& cheat) {

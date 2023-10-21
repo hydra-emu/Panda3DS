@@ -2,6 +2,7 @@
 #include "kernel.hpp"
 #include "kernel_types.hpp"
 #include "cpu.hpp"
+#include <android/log.h>
 
 Kernel::Kernel(CPU& cpu, Memory& mem, GPU& gpu, const EmulatorConfig& config)
 	: cpu(cpu), regs(cpu.regs()), mem(mem), handleCounter(0), serviceManager(regs, mem, gpu, currentProcess, *this, config) {
@@ -24,6 +25,7 @@ Kernel::Kernel(CPU& cpu, Memory& mem, GPU& gpu, const EmulatorConfig& config)
 	}
 
 	setVersion(1, 69);
+	__android_log_print(ANDROID_LOG_INFO, "Kernel", "Kernel initialized");
 }
 
 void Kernel::serviceSVC(u32 svc) {

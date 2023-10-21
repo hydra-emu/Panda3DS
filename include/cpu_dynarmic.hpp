@@ -9,6 +9,7 @@
 #include "helpers.hpp"
 #include "kernel.hpp"
 #include "memory.hpp"
+#include <android/log.h>
 
 class CPU;
 

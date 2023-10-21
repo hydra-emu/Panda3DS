@@ -33,6 +33,10 @@ enum class ROMType {
 	HB_3DSX,
 };
 
+struct CrashShitdroid {
+	std::optional<std::filesystem::path> path = std::nullopt;
+};
+
 class Emulator {
 	EmulatorConfig config;
 	CPU cpu;

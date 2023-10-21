@@ -7,6 +7,7 @@
 #include "helpers.hpp"
 #include "toml.hpp"
 
+#include <android/log.h>
 // Largely based on https://github.com/nba-emu/NanoBoyAdvance/blob/master/src/platform/core/src/config.cpp
 // We are legally allowed, as per the author's wish, to use the above code without any licensing restrictions
 // However we still want to follow the license as closely as possible and offer the proper attributions.
@@ -14,6 +15,7 @@
 EmulatorConfig::EmulatorConfig(const std::filesystem::path& path) { load(path); }
 
 void EmulatorConfig::load(const std::filesystem::path& path) {
+	__android_log_print(3, "Panda3D", "Loading config file from %s", path.c_str());
 	// If the configuration file does not exist, create it and return
 	std::error_code error;
 	if (!std::filesystem::exists(path, error)) {
@@ -82,6 +84,7 @@ void EmulatorConfig::load(const std::filesystem::path& path) {
 			sdWriteProtected = toml::find_or<toml::boolean>(sd, "WriteProtectVirtualSD", false);
 		}
 	}
+	__android_log_print(3, "Panda3D", "Loaded config file from %s", path.c_str());
 }
 
 void EmulatorConfig::save(const std::filesystem::path& path) {
@@ -116,4 +119,5 @@ void EmulatorConfig::save(const std::filesystem::path& path) {
 	std::ofstream file(path, std::ios::out);
 	file << data;
 	file.close();
+	__android_log_print(3, "Panda3D", "Save config file from %s", path.c_str());
 }

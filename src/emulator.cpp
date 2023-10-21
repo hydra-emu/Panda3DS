@@ -1,7 +1,5 @@
 #include "emulator.hpp"
 
-#include <SDL_filesystem.h>
-
 #include <fstream>
 
 #ifdef _WIN32
@@ -21,6 +19,7 @@ Emulator::Emulator()
 	  , httpServer(this)
 #endif
 {
+	__android_log_print(ANDROID_LOG_INFO, "Panda3D", "Emulator::Emulator()");
 #ifdef PANDA3DS_ENABLE_DISCORD_RPC
 	if (config.discordRpcEnabled) {
 		discordRpc.init();
@@ -33,6 +32,7 @@ Emulator::Emulator()
 Emulator::~Emulator() {
 	config.save(std::filesystem::current_path() / "config.toml");
 	lua.close();
+	__android_log_print(ANDROID_LOG_INFO, "DESTURCTOR", "Destructor");
 
 #ifdef PANDA3DS_ENABLE_DISCORD_RPC
 	discordRpc.stop();

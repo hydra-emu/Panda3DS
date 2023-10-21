@@ -8,6 +8,7 @@
 #include "config_mem.hpp"
 #include "resource_limits.hpp"
 #include "services/ptm.hpp"
+#include <android/log.h>
 
 CMRC_DECLARE(ConsoleFonts);
 
@@ -20,6 +21,7 @@ Memory::Memory(u64& cpuTicks, const EmulatorConfig& config) : cpuTicks(cpuTicks)
 	readTable.resize(totalPageCount, 0);
 	writeTable.resize(totalPageCount, 0);
 	memoryInfo.reserve(32);  // Pre-allocate some room for memory allocation info to avoid dynamic allocs
+	__android_log_print(ANDROID_LOG_INFO, "Memory", "Memory initialized");
 }
 
 void Memory::reset() {

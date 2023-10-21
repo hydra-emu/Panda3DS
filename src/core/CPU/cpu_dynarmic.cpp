@@ -14,6 +14,7 @@ CPU::CPU(Memory& mem, Kernel& kernel) : mem(mem), env(mem, kernel) {
     config.processor_id = 0;
     
     jit = std::make_unique<Dynarmic::A32::Jit>(config);
+    __android_log_print(ANDROID_LOG_INFO, "Dynarmic", "Dynarmic initialized");
 }
 
 void CPU::reset() {
