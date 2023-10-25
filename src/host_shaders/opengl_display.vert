@@ -1,4 +1,4 @@
-#version 410 core
+#version 300 es
 out vec2 UV;
 
 void main() {

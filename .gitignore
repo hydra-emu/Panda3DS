@@ -39,6 +39,23 @@ vsprojects/packages
 *.dep
 *.mcd
 
+# Android files
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
 # FastBuild and msfastbuild stuff
 *.bff
 *.fdb

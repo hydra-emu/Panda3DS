@@ -4,6 +4,8 @@
 
 #include <fstream>
 
+#include <android/log.h>
+
 #ifdef _WIN32
 #include <windows.h>
 
@@ -28,6 +30,7 @@ Emulator::Emulator()
 	}
 #endif
 	reset(ReloadOption::NoReload);
+	__android_log_print(ANDROID_LOG_INFO, "Panda3D", "Emulator::Emulator()");
 }
 
 Emulator::~Emulator() {

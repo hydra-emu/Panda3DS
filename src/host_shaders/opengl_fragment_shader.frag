@@ -1,4 +1,5 @@
-#version 410 core
+#version 300 es
+precision mediump float;
 
 in vec3 v_tangent;
 in vec3 v_normal;
@@ -27,7 +28,6 @@ uniform bool u_depthmapEnable;
 uniform sampler2D u_tex0;
 uniform sampler2D u_tex1;
 uniform sampler2D u_tex2;
-uniform sampler1DArray u_tex_lighting_lut;
 
 uniform uint u_picaRegs[0x200 - 0x48];
 
@@ -145,9 +145,15 @@ vec4 tevCalculateCombiner(int tev_id) {
 #define RR_LUT 6u
 
 float lutLookup(uint lut, uint light, float value) {
-	if (lut >= FR_LUT && lut <= RR_LUT) lut -= 1;
-	if (lut == SP_LUT) lut = light + 8;
-	return texture(u_tex_lighting_lut, vec2(value, lut)).r;
+	//if (lut >= FR_LUT && lut <= RR_LUT) lut -= 1;
+	//if (lut == SP_LUT) lut = light + 8;
+	//return texture(u_tex_lighting_lut, vec2(value, lut)).r;
+	return 0.0;
+}
+
+uint bitfieldExtract(uint val, int off, int size) {
+    uint mask = uint((1 << size) - 1);
+    return uint(val >> off) & mask;
 }
 
 vec3 regToColor(uint reg) {
