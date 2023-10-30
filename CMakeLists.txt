@@ -40,22 +40,6 @@ option(ENABLE_LUAJIT "Enable scripting with the Lua programming language" ON)
 option(ENABLE_QT_GUI "Enable the Qt GUI. If not selected then the emulator uses a minimal SDL-based UI instead" OFF)
 option(BUILD_HYDRA_CORE "Build a Hydra core" OFF)
 
-include_directories(${PROJECT_SOURCE_DIR}/include/)
-include_directories(${PROJECT_SOURCE_DIR}/include/kernel)
-include_directories (${FMT_INCLUDE_DIR})
-include_directories(third_party/boost/)
-include_directories(third_party/elfio/)
-include_directories(third_party/imgui/)
-include_directories(third_party/dynarmic/src)
-include_directories(third_party/cryptopp/)
-include_directories(third_party/cityhash/include)
-include_directories(third_party/result/include)
-include_directories(third_party/xxhash/include)
-include_directories(third_party/httplib)
-include_directories(third_party/stb)
-include_directories(third_party/opengl)
-include_directories(third_party/mio/single_include)
-
 add_compile_definitions(NOMINMAX)             # Make windows.h not define min/max macros because third-party deps don't like it
 add_compile_definitions(WIN32_LEAN_AND_MEAN)  # Make windows.h not include literally everything
 add_compile_definitions(SDL_MAIN_HANDLED)
@@ -81,17 +65,14 @@ endif()
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_TEST OFF CACHE BOOL "" FORCE)
-add_subdirectory(third_party/SDL2)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/SDL2)
 
-add_subdirectory(third_party/toml11)
-include_directories(${SDL2_INCLUDE_DIR})
-include_directories(third_party/toml11)
-include_directories(third_party/glm)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/toml11)
 
-add_subdirectory(third_party/cmrc)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/cmrc)
 
-set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/third_party/boost")
-set(Boost_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/third_party/boost")
+set(BOOST_ROOT "${CMAKE_CURRENT_LIST_DIR}/third_party/boost")
+set(Boost_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/third_party/boost")
 set(Boost_NO_SYSTEM_PATHS ON)
 add_compile_definitions(BOOST_NO_CXX98_FUNCTION_BASE) # Forbid Boost from using std::unary_function (Fixes MacOS build)
 
@@ -99,8 +80,8 @@ add_library(boost INTERFACE)
 target_include_directories(boost SYSTEM INTERFACE ${Boost_INCLUDE_DIR})
 
 set(CRYPTOPP_BUILD_TESTING OFF)
-add_subdirectory(third_party/cryptopp)
-add_subdirectory(third_party/glad)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/cryptopp)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/glad)
 
 if(ENABLE_LUAJIT)
     add_subdirectory(third_party/LuaJIT luajit)
@@ -118,10 +99,10 @@ endif()
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x86-64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     set(HOST_X64 TRUE)
     add_subdirectory(third_party/xbyak) # Add xbyak submodule for x86 JITs
-    include_directories(third_party/xbyak)
     add_compile_definitions(PANDA3DS_DYNAPICA_SUPPORTED)
     add_compile_definitions(PANDA3DS_X64_HOST)
 else()
+    message(FATAL_ERROR "PROC: ${CMAKE_SYSTEM_PROCESSOR}")
     set(HOST_X64 FALSE)
 endif()
 
@@ -231,8 +212,8 @@ set(HEADER_FILES include/emulator.hpp include/helpers.hpp include/termcolor.hpp
 cmrc_add_resource_library(
 	resources_console_fonts
 	NAMESPACE ConsoleFonts
-	WHENCE "src/core/services/fonts/"
-	"src/core/services/fonts/CitraSharedFontUSRelocated.bin"
+	WHENCE "${CMAKE_CURRENT_LIST_DIR}/src/core/services/fonts/"
+	"${CMAKE_CURRENT_LIST_DIR}/src/core/services/fonts/CitraSharedFontUSRelocated.bin"
 )
 
 set(THIRD_PARTY_SOURCE_FILES third_party/imgui/imgui.cpp
@@ -296,10 +277,10 @@ if(ENABLE_OPENGL)
 		resources_renderer_gl
 		NAMESPACE RendererGL
 		WHENCE "src/host_shaders/"
-		"src/host_shaders/opengl_display.frag"
-		"src/host_shaders/opengl_display.vert"
-		"src/host_shaders/opengl_vertex_shader.vert"
-		"src/host_shaders/opengl_fragment_shader.frag"
+		"${CMAKE_CURRENT_LIST_DIR}/src/host_shaders/opengl_display.frag"
+		"${CMAKE_CURRENT_LIST_DIR}/src/host_shaders/opengl_display.vert"
+		"${CMAKE_CURRENT_LIST_DIR}/src/host_shaders/opengl_vertex_shader.vert"
+		"${CMAKE_CURRENT_LIST_DIR}/src/host_shaders/opengl_fragment_shader.frag"
 	)
 endif()
 
@@ -378,13 +359,42 @@ if(ENABLE_VULKAN)
     set(ALL_SOURCES ${ALL_SOURCES} ${RENDERER_VK_SOURCE_FILES})
 endif()
 
-if(BUILD_HYDRA_CORE)
+if(ANDROID)
+    set(ALL_SOURCES_ABSOLUTE "")
+    foreach(source_file ${ALL_SOURCES})
+        list(APPEND ALL_SOURCES_ABSOLUTE "${CMAKE_CURRENT_LIST_DIR}/${source_file}")
+    endforeach()
+    set(ALL_SOURCES ${ALL_SOURCES_ABSOLUTE})
+
+    add_library(Alber STATIC ${ALL_SOURCES})
+elseif(BUILD_HYDRA_CORE)
     include_directories(third_party/hydra_core/include)
     add_library(Alber SHARED ${ALL_SOURCES} src/hydra_core.cpp)
     target_compile_definitions(Alber PRIVATE PANDA3DS_HYDRA_CORE=1)
 else()
     add_executable(Alber ${ALL_SOURCES})
 endif()
+
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include/)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include/kernel)
+target_include_directories(Alber PUBLIC ${FMT_INCLUDE_DIR})
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/boost/)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/elfio/)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/imgui/)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/dynarmic/src)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/cryptopp/)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/cityhash/include)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/result/include)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/xxhash/include)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/httplib)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/stb)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/opengl)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/mio/single_include)
+target_include_directories(Alber PUBLIC ${SDL2_INCLUDE_DIR})
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/toml11)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/glm)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/xbyak)
+target_include_directories(Alber PUBLIC ${CMAKE_CURRENT_LIST_DIR}/third_party/glad/include)
 
 if(ENABLE_LTO OR ENABLE_USER_BUILD)
     set_target_properties(Alber PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)

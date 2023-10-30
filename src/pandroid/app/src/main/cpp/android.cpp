@@ -6,7 +6,7 @@
 #include <jni.h>
 #include <string>
 #include "emulator.hpp"
-#include "renderer_gl.hpp"
+#include "renderer_gl/renderer_gl.hpp"
 
 Emulator* emulator = nullptr;
 RendererGL* renderer = nullptr;
@@ -36,6 +36,9 @@ extern "C" JNIEXPORT void JNICALL Java_com_panda3ds_pandroid_HydraGlRenderer_loa
                                                                                        jobject thiz,
                                                                                        jstring path)
 {
+    __android_log_print(2, "pander", "load");
+    __android_log_print(3, "pander", "load");
+    __android_log_print(4, "pander", "load");
     emulator = new Emulator;
     renderer = static_cast<RendererGL*>(emulator->getRenderer());
     if (!gladLoadGLES2Loader(reinterpret_cast<GLADloadproc>((void*)eglGetProcAddress))) {

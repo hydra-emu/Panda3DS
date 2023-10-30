@@ -4,7 +4,6 @@
 #include <chrono>  // For time since epoch
 #include <cmrc/cmrc.hpp>
 #include <ctime>
-#include <android/log.h>
 
 #include "config_mem.hpp"
 #include "resource_limits.hpp"
@@ -189,7 +188,6 @@ u32 Memory::read32(u32 vaddr) {
 					static int shutUpCounter = 0;
 					if (shutUpCounter < 5) { // Stop spamming about VRAM reads after the first 5
 						shutUpCounter++;
-						__android_log_print(ANDROID_LOG_WARN, "3DS", "VRAM read!");
 						Helpers::warn("VRAM read!\n");
 					}
 
