@@ -1,4 +1,4 @@
-name: Qt Build
+name: Android Build
 
 on:
   push:
